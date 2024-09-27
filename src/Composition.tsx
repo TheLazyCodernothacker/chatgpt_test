@@ -1,28 +1,33 @@
-import {AbsoluteFill} from 'remotion';
-import {Logo} from './Logo';
-import {Subtitle} from './Subtitle';
-import {Title} from './Title';
-import {z} from 'zod';
-import {zColor} from '@remotion/zod-types';
+import { useCurrentFrame, Motion, Spring, Stagger } from "remotion";
+import { Text, Box } from "remotion";
 
-export const myCompSchema = z.object({
-	titleText: z.string(),
-	titleColor: zColor(),
-	logoColor: zColor(),
-});
-
-export const MyComposition: React.FC<z.infer<typeof myCompSchema>> = ({
-	titleText: propOne,
-	titleColor: propTwo,
-	logoColor: propThree,
-}) => {
-	return (
-		<AbsoluteFill className="bg-gray-100 items-center justify-center">
-			<div className="m-10" />
-			<Logo logoColor={propThree} />
-			<div className="m-3" />
-			<Title titleText={propOne} titleColor={propTwo} />
-			<Subtitle />
-		</AbsoluteFill>
-	);
+export const MyComposition: React.FC = () => {
+  const frame = useCurrentFrame();
+  return (
+    <Box
+      width={1280}
+      height={720}
+      backgroundColor="#111111"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Motion.div
+        style={{
+          transform: Spring({
+            opacity: frame < 30 ? 0 : 1,
+            y: frame < 30 ? 100 : 0,
+          }),
+        }}
+      >
+        <Text
+          fontSize={72}
+          color="white"
+          textAlign="center"
+        >
+          Welcome to Remotion!
+        </Text>
+      </Motion.div>
+    </Box>
+  );
 };
