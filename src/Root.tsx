@@ -1,4 +1,5 @@
 import { Composition } from "remotion";
+import "./tailwind.css";
 import { MyComposition } from "./Composition";
 
 export const RemotionRoot: React.FC = () => {
@@ -7,10 +8,10 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="MyComp"
         component={MyComposition}
-        durationInFrames={60}
+        durationInFrames={1800} // 1 minute at 30fps
         fps={30}
-        width={1280}
-        height={720}
+        width={1920}
+        height={1080}
       />
     </>
   );
