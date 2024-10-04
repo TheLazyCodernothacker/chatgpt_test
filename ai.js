@@ -31,16 +31,28 @@ async function test() {
 	});
 
 	while (error) {
+		console.log(prompt);
 		const result = await chat.sendMessageStream(prompt);
 		const output = (await result.response).text();
-		console.log(output);
-		const json = JSON.parse(output.split('```json')[1].split('```')[0]);
-		console.log(json);
+		let json;
+		try {
+			console.log(output.split('```json')[1].split('```')[0]);
+			json = JSON.parse(output.split('```json')[1].split('```')[0]);
+		} catch (error) {
+			console.log('Failed to parse JSON: ' + error.message);
+			prompt =
+				'Failed to parse JSON (make sure output is in VALID JSON): ' +
+				error.message;
+			continue;
+		}
+
 		for (const key in json.files) {
-			writeFile(json.files[key], key);
+			await writeFile(json.files[key], key);
 		}
 		let error = false;
-		exec('npm run build', (e, stdout, stderr) => {
+		console.log('Building...');
+		await exec('npm run build', (e, stdout, stderr) => {
+			console.log('built');
 			if (e) {
 				error = e;
 				console.log('fail');
@@ -58,7 +70,10 @@ async function writeFile(content, fileName) {
 		await fsp.writeFile(join(process.cwd(), 'src', fileName), content);
 		console.log('Created ' + fileName + ' successfully');
 	} catch (error) {
-		console.log('Failed to create ' + fileName + ': ' + error.message, 'error');
+		console.log(
+			'Failed to create ' + fileName + ': ' + error.message,
+			'error. Do not forget to only respond with the JSON',
+		);
 	}
 }
 test();
