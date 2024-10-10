@@ -1,64 +1,100 @@
-import { useCurrentFrame, interpolate } from "remotion";
+import React from "react";
+import { useCurrentFrame, spring } from "remotion";
 
 const topics = [
   {
     title: "Primitive Types",
-    explanation: "Learn about int, double, boolean, and more!",
+    explanation: "Learn about int, double, boolean, and more.",
+    code: `int numStudents = 25;`,
   },
   {
     title: "Using Objects",
-    explanation: "Create instances of classes and utilize their methods.",
+    explanation: "Create and use objects from classes.",
+    code: `Scanner reader = new Scanner(System.in);`,
   },
   {
-    title: "Boolean Expressions & If Statements",
-    explanation: "Control the flow of your program with conditional logic.",
+    title: "Boolean Expressions",
+    explanation: "Use conditional statements for control flow.",
+    code: `if (x > 5) {
+  // do something
+}`,
   },
   {
     title: "Iteration",
-    explanation: "Repeat blocks of code with for and while loops.",
+    explanation: "Use for and while loops to repeat code.",
+    code: `for (int i = 0; i < 10; i++) {
+  // loop body
+}`,
   },
   {
-    title: "Classes",
-    explanation: "Design your own objects and methods with encapsulation.",
-  },
-  {
-    title: "Arrays",
-    explanation: "Store and manipulate collections of data efficiently.",
-  },
-  {
-    title: "ArrayList",
-    explanation: "A flexible, dynamic way to work with lists of objects.",
-  },
-  {
-    title: "2D Arrays",
-    explanation: "Represent tabular data and solve more complex problems.",
-  },
-  {
-    title: "Inheritance",
-    explanation: "Build relationships between classes and reuse code.",
+    title: "Array Lists",
+    explanation: "Store and manipulate collections of data.",
+    code: `ArrayList<String> names = new ArrayList<>();`,
   },
   {
     title: "Recursion",
-    explanation: "Solve problems by breaking them into smaller, self-similar parts.",
+    explanation: "Solve problems by breaking them down recursively.",
+    code: `public int factorial(int n) {
+  if (n == 0) {
+    return 1;
+  } else {
+    return n * factorial(n - 1);
+  }
+}`,
   },
 ];
 
 export const MyComposition: React.FC = () => {
   const frame = useCurrentFrame();
-  const index = Math.floor(frame / 360) % topics.length;
-  const progress = (frame % 360) / 360;
+  const index = Math.floor((frame / 240) % topics.length); // 8 seconds per topic
 
-  const titleOpacity = interpolate(progress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
-  const explanationOpacity = interpolate(progress, [0.1, 0.2, 0.8, 0.9], [0, 1, 1, 0]);
+  const titleOpacity = spring({
+    frame: frame - index * 240,
+    fps: 30,
+    config: {
+      damping: 200,
+      mass: 1,
+    },
+  });
+
+  const explanationOpacity = spring({
+    frame: frame - index * 240 - 60, // Delay explanation
+    fps: 30,
+    config: {
+      damping: 200,
+      mass: 1,
+    },
+  });
+
+  const codeOpacity = spring({ 
+    frame: frame - index * 240 - 120, 
+    fps: 30, 
+    config: {
+      damping: 200, 
+      mass: 1, 
+    }, 
+  }); 
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-500 w-screen h-screen flex flex-col items-center justify-center">
-      <h1 className="text-5xl font-bold text-white text-center px-10 opacity-0 transition-opacity duration-500" style={{ opacity: titleOpacity }}>
+      <h1
+        className="text-white text-5xl font-bold"
+        style={{ opacity: titleOpacity }}
+      >
         {topics[index].title}
       </h1>
-      <p className="text-2xl text-white mt-8 text-center px-20 opacity-0 transition-opacity duration-500" style={{ opacity: explanationOpacity }}>
+      <p
+        className="text-white text-xl mt-4"
+        style={{ opacity: explanationOpacity }}
+      >
         {topics[index].explanation}
       </p>
+      <div 
+        className="bg-gray-800 p-4 rounded-md mt-4 text-white font-mono"
+        style={{ opacity: codeOpacity }}
+      >
+        <code className="text-sm">{topics[index].code}</code>
+      </div>
     </div>
   );
 };
